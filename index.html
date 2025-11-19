@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+  <title>Hello, World!</title>
+</head>
+<body>
+  <h1>
+    Hello, World!
+  </h1>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>گیجٹ گلیکسی - متحدہ عرب امارات</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Tajawal -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body { font-family: 'Tajawal', sans-serif; background-color: #111827; color: #f9fafb; }
+        .gradient-text { background: linear-gradient(to right, #4f46e5, #c026d3); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .product-card { background-color: #1f2937; border: 1px solid #374151; border-radius: 1rem; transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden; position: relative; }
+        .product-card:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.2), 0 8px 10px -6px rgb(0 0 0 / 0.2); }
+        .image-upload-container { position: relative; width: 100%; height: 14rem; background-color: #374151; cursor: pointer; overflow: hidden; }
+        .image-preview { width: 100%; height: 100%; object-fit: cover; }
+        .upload-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; flex-direction: column; color: white; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
+        .image-upload-container.admin-view:hover .upload-overlay { opacity: 1; }
+        .hidden-file-input { display: none; }
+        .action-btn { background: linear-gradient(to right, #4f46e5, #7c3aed); transition: all 0.3s ease; }
+        .action-btn:hover { transform: scale(1.05); }
+        .whatsapp-btn { background: #25D366; transition: all 0.3s ease; }
+        .whatsapp-btn:hover { transform: scale(1.05); }
+        .edit-btn, .delete-btn { background-color: #374151; transition: all 0.3s ease; }
+        .edit-btn:hover, .delete-btn:hover { background-color: #4b5563; }
+        .delete-btn { background-color: #ef4444; }
+        .delete-btn:hover { background-color: #dc2626; }
+        [contenteditable="true"] { outline: 2px solid #4f46e5; background-color: #111827; padding: 0.25rem; border-radius: 0.25rem; }
+        #notification { transition: all 0.5s ease-in-out; transform: translateY(200%); background-color: #1f2937; border: 1px solid #4f46e5; z-index: 100; }
+        #notification.show { transform: translateY(0); }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-700">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-3xl font-extrabold gradient-text">گیجٹ گلیکسی</h1>
+            <div class="relative">
+                <i class="fa-solid fa-shopping-cart text-gray-300 text-2xl"></i>
+                <span id="cart-count" class="absolute -top-2 -right-3 bg-indigo-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-gray-900">0</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 py-10">
+        <div id="admin-controls" class="hidden text-center mb-12">
+             <h2 class="text-4xl font-extrabold text-white mb-2">ایڈمن پینل</h2>
+             <p class="text-lg text-gray-400 mb-6">یہاں سے نئی پروڈکٹس شامل کریں اور پرانی کو منظم کریں</p>
+             <button id="add-product-btn" class="action-btn text-white font-bold py-3 px-6 rounded-full">
+                <i class="fa-solid fa-plus"></i> نئی پروڈکٹ شامل کریں
+             </button>
+        </div>
+        <div id="customer-view-header" class="text-center mb-12">
+            <h2 class="text-4xl font-extrabold text-white mb-2">جدید ترین الیکٹرانکس اور گیجٹس</h2>
+            <p class="text-lg text-gray-400">کوالٹی، سہولت، اور بہترین قیمتیں، صرف آپ کے لیے</p>
+        </div>
+        <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <!-- Products will be dynamically inserted here -->
+        </div>
+    </main>
+
+    <footer class="bg-gray-900 mt-16 border-t border-gray-700">
+        <div class="container mx-auto py-6 px-6 text-center text-gray-400">
+            <p>&copy; 2025 گیجٹ گلیکسی. تمام حقوق محفوظ ہیں۔</p>
+        </div>
+    </footer>
+
+    <div id="notification" class="fixed bottom-5 right-5 text-white py-3 px-6 rounded-xl shadow-2xl flex items-center space-x-3 space-x-reverse">
+        <i id="notification-icon" class="fa-solid fa-check-circle text-green-400 text-xl"></i>
+        <span id="notification-text" class="font-semibold"></span>
+    </div>
+
+    <script>
+        const defaultProducts = [
+            { id: 1, name: "PowerCharge Pro - پاور بینک", description: "20,000mAh کی گنجائش والا ایک سٹائلش اور کمپیکٹ پاور بینک۔", price: 199, image: null },
+            { id: 2, name: "Wireless Soundbuds X", description: "بلوٹوتھ 5.2 وائرلیس ایئربڈز کے ساتھ کرسٹل کلیئر آڈیو کا تجربہ کریں۔", price: 249, image: null },
+            { id: 3, name: "AeroLap لیپ ٹاپ اسٹینڈ", description: "ایلومینیم سے بنا یہ اسٹینڈ آپ کے لیپ ٹاپ کو ایک آرام دہ زاویہ فراہم کرتا ہے۔", price: 129, image: null },
+            { id: 4, name: "Gamer's Edge کی بورڈ", description: "RGB لائٹنگ اور تیز ترین رسپانس والے بٹنوں کے ساتھ گیمنگ کا بہترین تجربہ۔", price: 349, image: null },
+        ];
+        const userWhatsAppNumber = "923100372789";
+        let products = [];
+
+        // DOM Elements
+        const productGrid = document.getElementById('product-grid');
+        const cartCountElement = document.getElementById('cart-count');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notification-text');
+        const notificationIcon = document.getElementById('notification-icon');
+        
+        let cartCount = 0;
+        let notificationTimeout;
+        let isAdmin = false;
+
+        // --- Core Functions ---
+        function saveData() {
+            // Only admin can save data
+            if (isAdmin) {
+                localStorage.setItem('myProducts', JSON.stringify(products));
+            }
+        }
+
+        function loadData() {
+            const savedProducts = localStorage.getItem('myProducts');
+            // Load from localStorage if available, otherwise use defaults
+            if (savedProducts) {
+                products = JSON.parse(savedProducts);
+            } else {
+                products = defaultProducts;
+            }
+        }
+
+        function displayProducts() {
+            productGrid.innerHTML = '';
+            products.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card flex flex-col';
+                card.id = `product-${product.id}`;
+                
+                const whatsappLink = `https://wa.me/${userWhatsAppNumber}?text=${encodeURIComponent('I am interested in ' + product.name)}`;
+                const imageSrc = product.image || `https://placehold.co/600x400/1f2937/f9fafb?text=${encodeURIComponent(product.name)}`;
+                
+                // Admin-only buttons and overlays
+                const adminTools = isAdmin ? `
+                    <div class="absolute top-3 right-3 flex flex-col space-y-2 z-20">
+                        <button class="edit-btn text-white font-bold p-2 rounded-full h-10 w-10 flex items-center justify-center" data-product-id="${product.id}">
+                            <i class="fa-solid fa-pencil"></i>
+                        </button>
+                        <button class="delete-btn text-white font-bold p-2 rounded-full h-10 w-10 flex items-center justify-center" data-product-id="${product.id}">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="upload-overlay">
+                        <i class="fa-solid fa-camera fa-2x"></i>
+                        <span class="block text-xs mt-2">تصویر تبدیل کریں</span>
+                    </div>
+                ` : '';
+
+                card.innerHTML = `
+                    <label for="file-input-${product.id}" class="image-upload-container ${isAdmin ? 'admin-view' : ''}">
+                        <img id="image-preview-${product.id}" class="image-preview" src="${imageSrc}" alt="Product Image Preview">
+                        ${adminTools}
+                    </label>
+                    ${isAdmin ? `<input type="file" id="file-input-${product.id}" class="hidden-file-input" accept="image/*" data-product-id="${product.id}">` : ''}
+                    
+                    <div class="p-5 flex flex-col flex-grow">
+                        <h3 id="name-${product.id}" class="text-xl font-bold text-white mb-2">${product.name}</h3>
+                        <p id="desc-${product.id}" class="text-gray-400 text-sm flex-grow mb-4">${product.description}</p>
+                        <div class="mt-auto">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-3xl font-extrabold text-white">
+                                    <span class="text-lg font-medium align-top">AED</span>
+                                    <span id="price-${product.id}">${product.price}</span>
+                                </span>
+                            </div>
+                            <div class="flex justify-between items-center space-x-2 space-x-reverse">
+                                <a href="${whatsappLink}" target="_blank" class="whatsapp-btn text-white font-bold py-2 px-4 rounded-full flex-1 text-center">
+                                    <i class="fa-brands fa-whatsapp"></i> واٹس ایپ
+                                </a>
+                                <button class="add-to-cart-btn action-btn text-white font-bold py-2 px-4 rounded-full flex-1">
+                                    <i class="fa-solid fa-cart-plus"></i> شامل کریں
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                productGrid.appendChild(card);
+            });
+        }
+
+        function showNotification(message, isSuccess = true) {
+            notificationText.textContent = message;
+            notificationIcon.className = isSuccess ? 'fa-solid fa-check-circle text-green-400 text-xl' : 'fa-solid fa-info-circle text-blue-400 text-xl';
+            notification.classList.add('show');
+            clearTimeout(notificationTimeout);
+            notificationTimeout = setTimeout(() => notification.classList.remove('show'), 3000);
+        }
+        
+        // --- Event Handlers ---
+        function handleImageUpload(event) {
+            const input = event.target;
+            const productId = input.dataset.productId;
+            const file = input.files[0];
+            if (file && productId) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const product = products.find(p => p.id == productId);
+                    if (product) {
+                        product.image = e.target.result;
+                        document.getElementById(`image-preview-${productId}`).src = e.target.result;
+                        saveData();
+                    }
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleEditToggle(productId, isEditing) {
+            const nameEl = document.getElementById(`name-${productId}`);
+            const descEl = document.getElementById(`desc-${productId}`);
+            const priceEl = document.getElementById(`price-${productId}`);
+            const editBtn = document.querySelector(`button.edit-btn[data-product-id="${productId}"]`);
+
+            [nameEl, descEl, priceEl].forEach(el => el.setAttribute('contenteditable', isEditing));
+
+            if (isEditing) {
+                editBtn.innerHTML = `<i class="fa-solid fa-save"></i>`;
+                editBtn.classList.add('action-btn');
+                nameEl.focus();
+            } else {
+                editBtn.innerHTML = `<i class="fa-solid fa-pencil"></i>`;
+                editBtn.classList.remove('action-btn');
+            }
+        }
+
+        function addNewProduct() {
+            const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+            const newProduct = {
+                id: newId,
+                name: "نئی پروڈکٹ",
+                description: "یہاں تفصیل لکھیں۔",
+                price: 0,
+                image: null
+            };
+            products.push(newProduct);
+            saveData();
+            displayProducts();
+            showNotification("نئی پروڈکٹ شامل کر دی گئی۔ ترمیم کرنے کے لیے ایڈٹ بٹن دبائیں۔", true);
+        }
+        
+        function deleteProduct(productId) {
+            if (confirm("کیا آپ واقعی اس پروڈکٹ کو حذف کرنا چاہتے ہیں؟")) {
+                products = products.filter(p => p.id != productId);
+                saveData();
+                displayProducts();
+                showNotification("پروڈکٹ حذف کر دی گئی۔", true);
+            }
+        }
+
+        // --- Event Listeners ---
+        productGrid.addEventListener('click', function(e) {
+            const cartBtn = e.target.closest('.add-to-cart-btn');
+            const editBtn = e.target.closest('.edit-btn');
+            const deleteBtn = e.target.closest('.delete-btn');
+
+            if (cartBtn) {
+                cartCount++;
+                cartCountElement.textContent = cartCount;
+                const productName = cartBtn.closest('.product-card').querySelector('h3').textContent;
+                showNotification(`"${productName.split('-')[0].trim()}" شامل کر دیا گیا!`);
+            }
+
+            if (isAdmin && editBtn) {
+                const productId = editBtn.dataset.productId;
+                const isEditing = document.getElementById(`name-${productId}`).isContentEditable;
+                if (isEditing) { // Currently editing, so save
+                    const product = products.find(p => p.id == productId);
+                    if (product) {
+                        product.name = document.getElementById(`name-${productId}`).innerText;
+                        product.description = document.getElementById(`desc-${productId}`).innerText;
+                        product.price = parseInt(document.getElementById(`price-${productId}`).innerText, 10) || 0;
+                        saveData();
+                        displayProducts(); // To update whatsapp link and reflect changes
+                        showNotification("پروڈکٹ کامیابی سے محفوظ ہو گئی۔", true);
+                    }
+                    handleEditToggle(productId, false);
+                } else { // Not editing, so start editing
+                    handleEditToggle(productId, true);
+                }
+            }
+            
+            if (isAdmin && deleteBtn) {
+                deleteProduct(deleteBtn.dataset.productId);
+            }
+        });
+
+        productGrid.addEventListener('change', function(e) {
+            if (isAdmin && e.target.matches('.hidden-file-input')) {
+                handleImageUpload(e);
+            }
+        });
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            isAdmin = urlParams.get('mode') === 'admin';
+            
+            loadData();
+            
+            if (isAdmin) {
+                document.getElementById('admin-controls').classList.remove('hidden');
+                document.getElementById('customer-view-header').classList.add('hidden');
+                document.getElementById('add-product-btn').addEventListener('click', addNewProduct);
+            }
+            
+            displayProducts();
+        });
+    </script>
+
+</body>
+</html>
